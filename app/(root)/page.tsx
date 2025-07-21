@@ -1,52 +1,58 @@
-import Link from "next/link";
-import Image from "next/image";
+import Link from 'next/link'
+import Image from 'next/image'
 
-import { Button } from "@/components/ui/button";
-import InterviewCard from "@/components/InterviewCard";
+import { Button } from '@/components/ui/button'
+import InterviewCard from '@/components/InterviewCard'
 
-import { getCurrentUser } from "@/lib/actions/auth.action";
- import {
-   getInterviewsByUserId,
-   getLatestInterviews,
- } from "@/lib/actions/general.action";
+import { getCurrentUser } from '@/lib/actions/auth.action'
+import {
+  getInterviewsByUserId,
+  getLatestInterviews,
+} from '@/lib/actions/general.action'
 
 async function Home() {
-   const user = await getCurrentUser();
+  const user = await getCurrentUser()
 
-   const [userInterviews, allInterview] = await Promise.all([
-     getInterviewsByUserId(user?.id!),
-     getLatestInterviews({ userId: user?.id! }),
-   ]);
+  const userId = user?.id;
+  const [userInterviews, allInterview] = await Promise.all([
+    userId ? getInterviewsByUserId(userId) : Promise.resolve([]),
+    console.log("user:", user),
 
-    
+    userId ? getLatestInterviews({ userId }) : Promise.resolve([]),
+  ])
+
+  const hasPastInterviews =
+    Array.isArray(userInterviews) && userInterviews.length > 0
+  const hasUpcomingInterviews =
+    Array.isArray(allInterview) && allInterview.length > 0
 
   return (
     <>
-      <section className="card-cta">
-        <div className="flex flex-col gap-6 max-w-lg">
+      <section className='card-cta'>
+        <div className='flex flex-col gap-6 max-w-lg'>
           <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
-          <p className="text-lg">
+          <p className='text-lg'>
             Practice real interview questions & get instant feedback
           </p>
 
-          <Button asChild className="btn-primary max-sm:w-full">
-            <Link href="/interview">Start an Interview</Link>
+          <Button asChild className='btn-primary max-sm:w-full'>
+            <Link href='/interview'>Start an Interview</Link>
           </Button>
         </div>
 
         <Image
-          src="/robot.png"
-          alt="robo-dude"
+          src='/robot.png'
+          alt='robo-dude'
           width={400}
           height={400}
-          className="max-sm:hidden"
+          className='max-sm:hidden'
         />
       </section>
 
-      <section className="flex flex-col gap-6 mt-8">
+      <section className='flex flex-col gap-6 mt-8'>
         <h2>Your Interviews</h2>
 
-        <div className="interviews-section">
+        <div className='interviews-section'>
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (
               <InterviewCard
@@ -65,10 +71,10 @@ async function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-6 mt-8">
+      <section className='flex flex-col gap-6 mt-8'>
         <h2>Take Interviews</h2>
 
-        <div className="interviews-section">
+        <div className='interviews-section'>
           {hasUpcomingInterviews ? (
             allInterview?.map((interview) => (
               <InterviewCard
@@ -87,7 +93,7 @@ async function Home() {
         </div>
       </section>
     </>
-  );
+  )
 }
 
-export default Home;
+export default Home
